@@ -4,15 +4,15 @@ project(laserscan_stacker)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
+  pointcloud_msgs
   message_filters
   laser_geometry
-  my_new_msgs
-  roscpp
-  rospy
   sensor_msgs
   std_msgs
-  tf
   pcl_ros
+  roscpp
+  rospy
+  tf
 )
 
 find_package(PCL 1.8 REQUIRED)
@@ -23,7 +23,6 @@ add_definitions(${PCL_DEFINITIONS})
 catkin_package()
 
 include_directories(
-# include
   ${catkin_INCLUDE_DIRS}
 )
 

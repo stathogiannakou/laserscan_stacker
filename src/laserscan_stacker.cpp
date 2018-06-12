@@ -4,7 +4,6 @@
 #include <tf/message_filter.h>
 #include <pcl_ros/point_cloud.h>
 #include <tf/transform_listener.h>
-#include <my_new_msgs/clustering.h>
 #include <sensor_msgs/PointCloud.h>
 #include <pcl/impl/point_types.hpp>
 #include <sensor_msgs/PointCloud2.h>
@@ -13,6 +12,7 @@
 #include <pcl/common/projection_matrix.h>
 #include <laser_geometry/laser_geometry.h>
 #include <sensor_msgs/point_cloud_conversion.h>
+#include <pointcloud_msgs/PointCloud2_Segments.h>
 
 std::string input_topic, out_topic, base_link_frame;
 
@@ -39,11 +39,11 @@ public:
   {
     laser_transform.registerCallback(boost::bind(&LaserscanStacker::scanCallback, this, _1));
     laser_transform.setTolerance(ros::Duration(0.01));
-    pub = node.advertise<my_new_msgs::clustering> (out_topic, 1);
+    pub = node.advertise<pointcloud_msgs::PointCloud2_Segments> (out_topic, 1);
     cnt = 0;
   }
 
-    my_new_msgs::clustering bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_){
+    pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_){
     sensor_msgs::PointCloud2 accumulator;
 
     for(unsigned j=0; j < v_.size(); j++){
@@ -53,11 +53,10 @@ public:
         }
       }
       sensor_msgs::PointCloud2 pc2;
-      sensor_msgs::convertPointCloudToPointCloud2(v_[j], pc2);
-      pcl::concatenatePointCloud( accumulator, pc2, accumulator);
+      sensor_msgs::convertPointCloudToPointCloud2(v_[j], pc2); pcl::concatenatePointCloud( accumulator, pc2, accumulator);
     }
 
-      my_new_msgs::clustering c;
+      pointcloud_msgs::PointCloud2_Segments c;
       c.header.stamp = ros::Time::now();
       c.clusters.push_back(accumulator);
       c.factor = factor;

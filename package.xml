@@ -22,19 +22,15 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>message_filterslaser_geometry</depend>
-  <depend>roscpp</depend>
-  <depend>rospy</depend>
+  <depend>pointcloud_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
   <depend>tf</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-  <depend package="laser_geometry"/>
-  <depend package="tf"/>
-  <depend package="sensor_msgs" />
-
   </export>
 </package>
