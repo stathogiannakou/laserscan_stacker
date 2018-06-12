@@ -1,5 +1,5 @@
 input_topic: /scan
-out_topic: /my_pointcloud
+out_topic: laserscan_stacker/scans
 size: 40
 factor: 5.0
 overlap: 35

@@ -14,8 +14,9 @@
 #include <laser_geometry/laser_geometry.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 
+std::string input_topic, out_topic, base_link_frame;
 
-class LaserScanToPointCloud2{
+class LaserscanStacker{
 
 public:
   int size, overlap, cnt, num_scans;
@@ -24,8 +25,6 @@ public:
   ros::NodeHandle node;
   std::deque<sensor_msgs::PointCloud> v;
 
-  // std::string out_topic;
-  // std::string input_topic;
 
   laser_geometry::LaserProjection projector;
   message_filters::Subscriber<sensor_msgs::LaserScan> laser_sub;
@@ -33,14 +32,14 @@ public:
   tf::TransformListener tfListener;
   tf::MessageFilter<sensor_msgs::LaserScan> laser_transform;
 
-  LaserScanToPointCloud2(ros::NodeHandle n) :
+  LaserscanStacker(ros::NodeHandle n) :
     node(n),
-    laser_sub(node, "/scan", 10),
-    laser_transform(laser_sub, tfListener, "base_link", 10)
+    laser_sub(node, input_topic, 10),
+    laser_transform(laser_sub, tfListener, base_link_frame, 10)
   {
-    laser_transform.registerCallback(boost::bind(&LaserScanToPointCloud2::scanCallback, this, _1));
+    laser_transform.registerCallback(boost::bind(&LaserscanStacker::scanCallback, this, _1));
     laser_transform.setTolerance(ros::Duration(0.01));
-    pub = node.advertise<my_new_msgs::clustering> ("/my_pointcloud", 1);
+    pub = node.advertise<my_new_msgs::clustering> (out_topic, 1);
     cnt = 0;
   }
 
@@ -48,21 +47,15 @@ public:
     sensor_msgs::PointCloud2 accumulator;
 
     for(unsigned j=0; j < v_.size(); j++){
-
-      // boost::chrono::system_clock::time_point before = boost::chrono::system_clock::now(); 
       if (j > 0){
         for(size_t i=0; i < v_.at(j).points.size(); i++) {
           v_.at(j).points[i].z = v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor;
         }
       }
-
-      // boost::chrono::system_clock::time_point now = boost::chrono::system_clock::now();
-
       sensor_msgs::PointCloud2 pc2;
       sensor_msgs::convertPointCloudToPointCloud2(v_[j], pc2);
       pcl::concatenatePointCloud( accumulator, pc2, accumulator);
-      // boost::chrono::nanoseconds t = boost::chrono::duration_cast<boost::chrono::nanoseconds>(now-before);
-      }
+    }
 
       my_new_msgs::clustering c;
       c.header.stamp = ros::Time::now();
@@ -78,7 +71,7 @@ public:
 
  void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in){
     sensor_msgs::PointCloud2 cloud;
-    projector.transformLaserScanToPointCloud("base_link", *scan_in, cloud, tfListener, 1000.0);
+    projector.transformLaserScanToPointCloud(base_link_frame, *scan_in, cloud, tfListener, 1000.0);
 
     sensor_msgs::PointCloud pc1;
     sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
@@ -101,20 +94,22 @@ public:
 };
 
 int main(int argc, char** argv){
-  
-  ros::init(argc, argv, "laserscan_topcl");
+
+  ros::init(argc, argv, "laserscan_stacker");
   ros::NodeHandle n;
 
-  LaserScanToPointCloud2 lstopc(n);
+  n.param("laserscan_stacker/out_topic", out_topic, std::string("laserscan_stacker/scans"));
+  n.param("laserscan_stacker/input_topic", input_topic, std::string("/scan"));
+  n.param("laserscan_stacker/base_link_frame", base_link_frame, std::string("base_link"));
 
-  n.param("laserscan_topcl/size", lstopc.size, 40);
-  n.param("laserscan_topcl/factor", lstopc.factor, 5.0);
-  n.param("laserscan_topcl/overlap", lstopc.overlap, 35);
-  // n.param("laserscan_topcl/input_topic", lstopc.input_topic, std::string("/scan"));
-  // n.param("laserscan_topcl/out_topic", lstopc.out_topic, std::string("/my_pointcloud"));
+  LaserscanStacker lstopc(n);
+
+  n.param("laserscan_stacker/size", lstopc.size, 40);
+  n.param("laserscan_stacker/factor", lstopc.factor, 5.0);
+  n.param("laserscan_stacker/overlap", lstopc.overlap, 35);
 
 
   ros::spin();
-  
+
   return 0;
 }
