@@ -1,5 +1,6 @@
 input_topic: /scan
 out_topic: laserscan_stacker/scans
+base_link_frame: base_link
 size: 40
 factor: 5.0
 overlap: 35
