@@ -20,6 +20,8 @@ class LaserscanStacker{
 
 public:
   int size, overlap, cnt, num_scans;
+  float ang_min , ang_max , ang_incr , time_incr;
+  float rng_min , rng_max , scan_tm;
   double factor;
   ros::Publisher pub;
   ros::NodeHandle node;
@@ -62,7 +64,14 @@ public:
       c.factor = factor;
       c.overlap = overlap ;
       c.first_stamp = v_.at(0).header.stamp;
-      c.num_scans = num_scans ;
+
+      c.num_scans = num_scans;
+      c.angle_min = ang_min;
+      c.angle_max = ang_max;
+      c.angle_increment = ang_incr;
+      c.range_min = rng_min;
+      c.range_max = rng_max;
+      c.scan_time = scan_tm;
 
     return c;
   }
@@ -87,6 +96,13 @@ public:
       num_scans = cnt ;
       cnt = 0;
     }
+    ang_min = scan_in->angle_min;
+    ang_max = scan_in->angle_max ;
+    ang_incr = scan_in->angle_increment;
+    time_incr = scan_in->time_increment;
+    rng_min = scan_in->range_min;
+    rng_max = scan_in->range_max;
+    scan_tm = scan_in->scan_time;
 
 }
 
