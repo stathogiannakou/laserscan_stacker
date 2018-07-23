@@ -55,7 +55,8 @@ public:
         }
       }
       sensor_msgs::PointCloud2 pc2;
-      sensor_msgs::convertPointCloudToPointCloud2(v_[j], pc2); pcl::concatenatePointCloud( accumulator, pc2, accumulator);
+      sensor_msgs::convertPointCloudToPointCloud2(v_[j], pc2);
+      pcl::concatenatePointCloud( accumulator, pc2, accumulator);
     }
 
       pointcloud_msgs::PointCloud2_Segments c;
