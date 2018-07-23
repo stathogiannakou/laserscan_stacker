@@ -3,4 +3,9 @@
     <node pkg="laserscan_stacker" type="laserscan_stacker" respawn="false" name="laserscan_stacker" output="screen">
         <rosparam file="$(find laserscan_stacker)/config/laserscan_stacker.yaml" command="load" />
     </node>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" respawn="false" name="laserscan_filter" output="screen">
+        <rosparam file="$(find laserscan_stacker)/config/laserscan_filter.yaml" command="load"/>
+    </node>
+
 </launch>
