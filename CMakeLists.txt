@@ -27,4 +27,5 @@ include_directories(
 )
 
 add_executable(laserscan_stacker src/laserscan_stacker.cpp)
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(laserscan_stacker ${catkin_LIBRARIES})
