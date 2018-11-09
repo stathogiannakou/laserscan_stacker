@@ -102,10 +102,10 @@ public:
     ang_max = scan_in->angle_max ;
     ang_incr = scan_in->angle_increment;
     time_incr = scan_in->time_increment;
-    frame_id = scan_in->header.frame_id;
     rng_min = scan_in->range_min;
     rng_max = scan_in->range_max;
     scan_tm = scan_in->scan_time;
+    frame_id = scan_in->header.frame_id;
 
 }
 
