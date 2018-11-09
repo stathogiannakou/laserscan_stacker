@@ -67,7 +67,6 @@ public:
       c.overlap = overlap ;
       c.first_stamp = v_.at(0).header.stamp;
       c.header.frame_id = frame_id;
-
       c.num_scans = num_scans;
       c.angle_min = ang_min;
       c.angle_max = ang_max;
