@@ -87,6 +87,7 @@ public:
     sensor_msgs::PointCloud pc1;
     sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
     // TODO Investigate future problems (?)
+    pc1.header.stamp = ros::Time::now();  // (?)
     cnt++;
     v.push_back(pc1);
     if (v.size() > size and cnt >= overlap){
