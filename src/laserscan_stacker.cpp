@@ -23,6 +23,7 @@ public:
   float ang_min , ang_max , ang_incr , time_incr;
   float rng_min , rng_max , scan_tm;
   double factor;
+  std::string frame_id;
   ros::Publisher pub;
   ros::NodeHandle node;
   std::deque<sensor_msgs::PointCloud> v;
@@ -65,7 +66,7 @@ public:
       c.factor = factor;
       c.overlap = overlap ;
       c.first_stamp = v_.at(0).header.stamp;
-
+      c.header.frame_id = frame_id;
       c.num_scans = num_scans;
       c.angle_min = ang_min;
       c.angle_max = ang_max;
@@ -104,6 +105,7 @@ public:
     rng_min = scan_in->range_min;
     rng_max = scan_in->range_max;
     scan_tm = scan_in->scan_time;
+    frame_id = scan_in->header.frame_id;
 
 }
 
