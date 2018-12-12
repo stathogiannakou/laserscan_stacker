@@ -96,10 +96,10 @@ public:
           v.erase(v.begin(), v.begin() + overlap);
         }
 
-        pointcloud_msgs::PointCloud2_Segments pc2s_msg = bufferToAccumulator(v);
-        pub.publish(pc2s_msg);
+        pub.publish(bufferToAccumulator(v));
         num_scans = cnt ;
         cnt = 0;
+
       }
       frame_id = scan_in->header.frame_id;
       ang_min = scan_in->angle_min;
@@ -111,8 +111,6 @@ public:
       scan_tm = scan_in->scan_time;
     }
     catch(...){}
-    
-
 }
 
 };
