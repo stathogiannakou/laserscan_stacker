@@ -81,32 +81,36 @@ public:
 
  void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in){
     sensor_msgs::PointCloud2 cloud;
-    projector.transformLaserScanToPointCloud(base_link_frame, *scan_in, cloud, tfListener, 1000.0);
+    try{
+      projector.transformLaserScanToPointCloud(base_link_frame, *scan_in, cloud, tfListener, 1000.0);
 
-    sensor_msgs::PointCloud pc1;
-    sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
-    // TODO Investigate future problems (?)
-    pc1.header.stamp = ros::Time::now();  // (?)
-    cnt++;
-    v.push_back(pc1);
-    if (v.size() > size and cnt >= overlap){
-      if(cnt != v.size()){
-          //v = std::vector<sensor_msgs::PointCloud>(v.begin() + overlap, v.end());
-        v.erase(v.begin(), v.begin() + overlap);
+      sensor_msgs::PointCloud pc1;
+      sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
+      // TODO Investigate future problems (?)
+      pc1.header.stamp = ros::Time::now();
+      cnt++;
+      v.push_back(pc1);
+      if (v.size() > size and cnt >= overlap){
+        if(cnt != v.size()){
+            //v = std::vector<sensor_msgs::PointCloud>(v.begin() + overlap, v.end());
+          v.erase(v.begin(), v.begin() + overlap);
+        }
+
+        pub.publish(bufferToAccumulator(v));
+        num_scans = cnt ;
+        cnt = 0;
+
       }
-      pub.publish(bufferToAccumulator(v));
-      num_scans = cnt ;
-      cnt = 0;
+      frame_id = scan_in->header.frame_id;
+      ang_min = scan_in->angle_min;
+      ang_max = scan_in->angle_max ;
+      ang_incr = scan_in->angle_increment;
+      time_incr = scan_in->time_increment;
+      rng_min = scan_in->range_min;
+      rng_max = scan_in->range_max;
+      scan_tm = scan_in->scan_time;
     }
-    ang_min = scan_in->angle_min;
-    ang_max = scan_in->angle_max ;
-    ang_incr = scan_in->angle_increment;
-    time_incr = scan_in->time_increment;
-    rng_min = scan_in->range_min;
-    rng_max = scan_in->range_max;
-    scan_tm = scan_in->scan_time;
-    frame_id = scan_in->header.frame_id;
-
+    catch(...){}
 }
 
 };
