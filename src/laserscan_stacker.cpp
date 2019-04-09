@@ -20,10 +20,6 @@
 using namespace std;
 
 
-//int first_time = 0;
-//ros::Time currtime;
-//ros::Time prevtime;
-
 
 std::string input_topic, out_topic, base_link_frame;
 
@@ -35,9 +31,7 @@ public:
   float rng_min , rng_max , scan_tm;
   double factor;
 
- // int flag=0;
-
-  
+ 
 
   std::string frame_id;
   ros::Publisher pub;
@@ -82,13 +76,9 @@ public:
 
 
    
-    
-  
 
 
-
-
-      c.header.stamp = ros::Time::now(); // + diff;
+      c.header.stamp = ros::Time::now(); 
       c.clusters.push_back(accumulator);
       c.factor = factor;
       c.overlap = overlap ;
@@ -114,21 +104,12 @@ public:
 
       sensor_msgs::PointCloud pc1;
       sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
-      // TODO Investigate future problems (?)
-     // pc1.header.stamp = ros::Time::now();
-      // cnt++;
+    
       v.push_back(pc1);
 
       r_time = scan_in->header.stamp;
      
 
-    /*  if (flag==0) {
-
-
-       r_time=scan_in->header.stamp;
-       flag=1;
-
-      }  */
       
 
       if (v.size() > size){
