@@ -14,6 +14,17 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <pointcloud_msgs/PointCloud2_Segments.h>
 
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+
+//int first_time = 0;
+//ros::Time currtime;
+//ros::Time prevtime;
+
+
 std::string input_topic, out_topic, base_link_frame;
 
 class LaserscanStacker{
@@ -23,9 +34,15 @@ public:
   float ang_min , ang_max , ang_incr , time_incr;
   float rng_min , rng_max , scan_tm;
   double factor;
+
+ // int flag=0;
+
+  
+
   std::string frame_id;
   ros::Publisher pub;
   ros::NodeHandle node;
+  ros::Time r_time;
   std::deque<sensor_msgs::PointCloud> v;
 
 
@@ -42,11 +59,12 @@ public:
   {
     laser_transform.registerCallback(boost::bind(&LaserscanStacker::scanCallback, this, _1));
     laser_transform.setTolerance(ros::Duration(0.01));
-    pub = node.advertise<pointcloud_msgs::PointCloud2_Segments> (out_topic, 1);
+    pub = node.advertise<pointcloud_msgs::PointCloud2_Segments> (out_topic, 5);
     cnt = 0;
   }
+  
 
-    pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_){
+  pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_ ,  ros::Time rt){
     sensor_msgs::PointCloud2 accumulator;
 
     for(unsigned j=0; j < v_.size(); j++){
@@ -61,7 +79,16 @@ public:
     }
 
       pointcloud_msgs::PointCloud2_Segments c;
-      c.header.stamp = ros::Time::now();
+
+
+   
+    
+  
+
+
+
+
+      c.header.stamp = ros::Time::now(); // + diff;
       c.clusters.push_back(accumulator);
       c.factor = factor;
       c.overlap = overlap ;
@@ -74,6 +101,7 @@ public:
       c.range_min = rng_min;
       c.range_max = rng_max;
       c.scan_time = scan_tm;
+      c.rec_time = rt;
 
     return c;
   }
@@ -87,19 +115,29 @@ public:
       sensor_msgs::PointCloud pc1;
       sensor_msgs::convertPointCloud2ToPointCloud (cloud, pc1);
       // TODO Investigate future problems (?)
-      pc1.header.stamp = ros::Time::now();
-      cnt++;
+     // pc1.header.stamp = ros::Time::now();
+      // cnt++;
       v.push_back(pc1);
-      if (v.size() > size and cnt >= overlap){
-        if(cnt != v.size()){
-            //v = std::vector<sensor_msgs::PointCloud>(v.begin() + overlap, v.end());
-          v.erase(v.begin(), v.begin() + overlap);
-        }
 
-        pub.publish(bufferToAccumulator(v));
-        num_scans = cnt ;
-        cnt = 0;
+      r_time = scan_in->header.stamp;
+     
 
+    /*  if (flag==0) {
+
+
+       r_time=scan_in->header.stamp;
+       flag=1;
+
+      }  */
+      
+
+      if (v.size() > size){
+ 
+
+        pub.publish(bufferToAccumulator(v, r_time));
+
+        v.erase(v.begin(), v.begin() + overlap);
+    
       }
       frame_id = scan_in->header.frame_id;
       ang_min = scan_in->angle_min;
@@ -111,7 +149,7 @@ public:
       scan_tm = scan_in->scan_time;
     }
     catch(...){}
-}
+  }
 
 };
 
