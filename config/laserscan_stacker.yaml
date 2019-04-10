@@ -1,4 +1,4 @@
-input_topic: /scan_filtered
+input_topic: hokuyo_base/scan
 out_topic: laserscan_stacker/scans
 base_link_frame: laser
 size: 60
