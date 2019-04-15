@@ -31,14 +31,11 @@ public:
   float rng_min , rng_max , scan_tm;
   double factor;
 
- 
-
   std::string frame_id;
   ros::Publisher pub;
   ros::NodeHandle node;
   ros::Time r_time;
   std::deque<sensor_msgs::PointCloud> v;
-
 
   laser_geometry::LaserProjection projector;
   message_filters::Subscriber<sensor_msgs::LaserScan> laser_sub;
@@ -54,7 +51,6 @@ public:
     laser_transform.registerCallback(boost::bind(&LaserscanStacker::scanCallback, this, _1));
     laser_transform.setTolerance(ros::Duration(0.01));
     pub = node.advertise<pointcloud_msgs::PointCloud2_Segments> (out_topic, 5);
-    cnt = 0;
   }
   
 
@@ -73,10 +69,6 @@ public:
     }
 
       pointcloud_msgs::PointCloud2_Segments c;
-
-
-   
-
 
       c.header.stamp = ros::Time::now(); 
       c.clusters.push_back(accumulator);
@@ -109,14 +101,8 @@ public:
 
       r_time = scan_in->header.stamp;
      
-
-      
-
       if (v.size() > size){
- 
-
         pub.publish(bufferToAccumulator(v, r_time));
-
         v.erase(v.begin(), v.begin() + overlap);
     
       }
