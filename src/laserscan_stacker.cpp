@@ -102,9 +102,7 @@ public:
       r_time = scan_in->header.stamp;
      
       if (v.size() > size){
-
         pub.publish(bufferToAccumulator(v, r_time));
-
         v.erase(v.begin(), v.begin() + overlap);
     
       }
