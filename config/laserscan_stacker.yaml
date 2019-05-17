@@ -1,6 +1,8 @@
-input_topic: hokuyo_base/scan
+input_topic: /scan_filtered
+#input_topic: /scan
 out_topic: laserscan_stacker/scans
 base_link_frame: laser
 size: 60
-factor: 5.0
-overlap: 35
+factor: 1.0
+# overlap: 35
+overlap: 1
