@@ -57,10 +57,15 @@ public:
   pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_ ,  ros::Time rt){
     sensor_msgs::PointCloud2 accumulator;
 
+    double middle_z=0.0;
+
     for(unsigned j=0; j < v_.size(); j++){
       if (j > 0){
         for(size_t i=0; i < v_.at(j).points.size(); i++) {
           v_.at(j).points[i].z = v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor;
+        }
+        if(j == v_.size()/2 && v_.at(j).points[0].z> middle_z){
+          middle_z = v_.at(j).points[0].z;
         }
       }
       sensor_msgs::PointCloud2 pc2;
@@ -68,22 +73,24 @@ public:
       pcl::concatenatePointCloud( accumulator, pc2, accumulator);
     }
 
-      pointcloud_msgs::PointCloud2_Segments c;
+    pointcloud_msgs::PointCloud2_Segments c;
 
-      c.header.stamp = ros::Time::now(); 
-      c.clusters.push_back(accumulator);
-      c.factor = factor;
-      c.overlap = overlap ;
-      c.first_stamp = v_.at(0).header.stamp;
-      c.header.frame_id = frame_id;
-      c.num_scans = num_scans;
-      c.angle_min = ang_min;
-      c.angle_max = ang_max;
-      c.angle_increment = ang_incr;
-      c.range_min = rng_min;
-      c.range_max = rng_max;
-      c.scan_time = scan_tm;
-      c.rec_time = rt;
+    c.header.stamp = ros::Time::now(); 
+    c.clusters.push_back(accumulator);
+    c.factor = factor;
+    c.overlap = overlap ;
+    c.first_stamp = v_.at(0).header.stamp;
+    c.header.frame_id = frame_id;
+    c.num_scans = num_scans;
+    c.angle_min = ang_min;
+    c.angle_max = ang_max;
+    c.angle_increment = ang_incr;
+    c.range_min = rng_min;
+    c.range_max = rng_max;
+    c.scan_time = scan_tm;
+    c.rec_time = rt;
+    c.middle_z = middle_z;
+    c.idForTracking = -1;
 
     return c;
   }
