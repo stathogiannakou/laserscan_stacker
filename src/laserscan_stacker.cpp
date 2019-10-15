@@ -1,22 +1,16 @@
 #include <ros/ros.h>
-#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <tf/message_filter.h>
 #include <pcl_ros/point_cloud.h>
 #include <tf/transform_listener.h>
-#include <sensor_msgs/PointCloud.h>
 #include <pcl/impl/point_types.hpp>
 #include <sensor_msgs/PointCloud2.h>
 #include <message_filters/subscriber.h>
-#include <sensor_msgs/ChannelFloat32.h>
-#include <pcl/common/projection_matrix.h>
 #include <laser_geometry/laser_geometry.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <pointcloud_msgs/PointCloud2_Segments.h>
 
 
-#include <iostream>
-#include <fstream>
 using namespace std;
 
 
@@ -64,7 +58,7 @@ public:
         for(size_t i=0; i < v_.at(j).points.size(); i++) {
           v_.at(j).points[i].z = v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor;
         }
-        if(j == v_.size()/2 && v_.at(j).points[0].z> middle_z){
+        if(j == v_.size() / 2 && v_.at(j).points[0].z > middle_z){
           middle_z = v_.at(j).points[0].z;
         }
       }
