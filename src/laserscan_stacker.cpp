@@ -56,7 +56,7 @@ public:
     for(unsigned j=0; j < v_.size(); j++){
       if (j > 0){
         for(size_t i=0; i < v_.at(j).points.size(); i++) {
-          v_.at(j).points[i].z = v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor;
+          v_.at(j).points[i].z = std::max(0.0, v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor);
         }
         if(j == v_.size() / 2 && v_.at(j).points[0].z > middle_z){
           middle_z = v_.at(j).points[0].z;
