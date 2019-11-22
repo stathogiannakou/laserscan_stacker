@@ -48,21 +48,30 @@ public:
   }
   
 
-  pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_ ,  ros::Time rt){
+  pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_, ros::Time rt){
     sensor_msgs::PointCloud2 accumulator;
 
     double middle_z = 0.0;
+    double z_diff = 0.0;
     int last_valid_index = -1;
+    int tmp_index = -1;
 
     for (unsigned j=0; j < v_.size(); j++) {
       if (j > 0) {
-        for (size_t i=0; i < v_[j].points.size(); i++) {
-          if (v_[j-1].points.size()) {
-            v_[j].points[i].z = std::max(0.0, v_[j-1].points[0].z + ros::Duration(v_[j].header.stamp - v_[j-1].header.stamp).toSec() * factor);
-            last_valid_index = j;
+        tmp_index = -1;
+        if (v_[j-1].points.size()) {
+          tmp_index = j-1;
+        }
+        else if (last_valid_index >= 0) {
+          tmp_index = last_valid_index;
+        }
+        if (tmp_index >= 0) {
+          z_diff = std::max(0.0, v_[tmp_index].points[0].z + ros::Duration(v_[j].header.stamp - v_[tmp_index].header.stamp).toSec() * factor);
+          for (size_t i=0; i < v_[j].points.size(); i++) {
+              v_[j].points[i].z = z_diff;
           }
-          else if (last_valid_index >= 0) {
-            v_[j].points[i].z = std::max(0.0, v_[last_valid_index].points[0].z + ros::Duration(v_[j].header.stamp - v_[last_valid_index].header.stamp).toSec() * factor);
+          if (v_[j].points.size()) {
+            last_valid_index = j;
           }
         }
         if (j == v_.size() / 2 and v_[j].points.size() and v_[j].points[0].z > middle_z) {
