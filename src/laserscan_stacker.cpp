@@ -53,13 +53,15 @@ public:
 
     double middle_z=0.0;
 
-    for(unsigned j=0; j < v_.size(); j++){
-      if (j > 0){
-        for(size_t i=0; i < v_.at(j).points.size(); i++) {
-          v_.at(j).points[i].z = std::max(0.0, v_.at(j-1).points[0].z + ros::Duration(v_.at(j).header.stamp - v_.at(j-1).header.stamp).toSec() * factor);
+    for(unsigned j=0; j < v_.size(); j++) {
+      if (j > 0) {
+        for (size_t i=0; i < v_[j].points.size(); i++) {
+          if (v_[j-1].points.size()) {
+            v_[j].points[i].z = std::max(0.0, v_[j-1].points[0].z + ros::Duration(v_[j].header.stamp - v_[j-1].header.stamp).toSec() * factor);
+          }
         }
-        if(j == v_.size() / 2 && v_.at(j).points[0].z > middle_z){
-          middle_z = v_.at(j).points[0].z;
+        if (j == v_.size() / 2 && v_[j].points.size() && v_[j].points[0].z > middle_z) {
+          middle_z = v_[j].points[0].z;
         }
       }
       sensor_msgs::PointCloud2 pc2;
@@ -73,7 +75,9 @@ public:
     c.clusters.push_back(accumulator);
     c.factor = factor;
     c.overlap = overlap ;
-    c.first_stamp = v_.at(0).header.stamp;
+    if (v_.size()) { // this should not be needed, but bsts
+      c.first_stamp = v_[0].header.stamp;
+    }
     c.header.frame_id = frame_id;
     c.num_scans = num_scans;
     c.angle_min = ang_min;
@@ -101,12 +105,12 @@ public:
       v.push_back(pc1);
 
       r_time = scan_in->header.stamp;
-     
+
       if (v.size() > size){
         pub.publish(bufferToAccumulator(v, r_time));
         v.erase(v.begin(), v.begin() + overlap);
-    
       }
+
       frame_id = scan_in->header.frame_id;
       ang_min = scan_in->angle_min;
       ang_max = scan_in->angle_max ;
