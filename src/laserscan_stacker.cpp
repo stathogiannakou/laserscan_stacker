@@ -58,9 +58,10 @@ public:
       if (j > 0) {
         for (size_t i=0; i < v_[j].points.size(); i++) {
           if (v_[j-1].points.size()) {
-            last_valid_index = j-1;
+            v_[j].points[i].z = std::max(0.0, v_[j-1].points[0].z + ros::Duration(v_[j].header.stamp - v_[j-1].header.stamp).toSec() * factor);
+            last_valid_index = j;
           }
-          if (last_valid_index >= 0) {
+          else if (last_valid_index >= 0) {
             v_[j].points[i].z = std::max(0.0, v_[last_valid_index].points[0].z + ros::Duration(v_[j].header.stamp - v_[last_valid_index].header.stamp).toSec() * factor);
           }
         }
