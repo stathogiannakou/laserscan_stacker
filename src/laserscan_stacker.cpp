@@ -51,16 +51,20 @@ public:
   pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(std::deque<sensor_msgs::PointCloud> v_ ,  ros::Time rt){
     sensor_msgs::PointCloud2 accumulator;
 
-    double middle_z=0.0;
+    double middle_z = 0.0;
+    int last_valid_index = -1;
 
-    for(unsigned j=0; j < v_.size(); j++) {
+    for (unsigned j=0; j < v_.size(); j++) {
       if (j > 0) {
         for (size_t i=0; i < v_[j].points.size(); i++) {
           if (v_[j-1].points.size()) {
-            v_[j].points[i].z = std::max(0.0, v_[j-1].points[0].z + ros::Duration(v_[j].header.stamp - v_[j-1].header.stamp).toSec() * factor);
+            last_valid_index = j-1;
+          }
+          if (last_valid_index >= 0) {
+            v_[j].points[i].z = std::max(0.0, v_[last_valid_index].points[0].z + ros::Duration(v_[j].header.stamp - v_[last_valid_index].header.stamp).toSec() * factor);
           }
         }
-        if (j == v_.size() / 2 && v_[j].points.size() && v_[j].points[0].z > middle_z) {
+        if (j == v_.size() / 2 and v_[j].points.size() and v_[j].points[0].z > middle_z) {
           middle_z = v_[j].points[0].z;
         }
       }
