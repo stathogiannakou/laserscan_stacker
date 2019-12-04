@@ -1,7 +1,6 @@
 input_topic: /scan_filtered
 #input_topic: /scan
 out_topic: laserscan_stacker/scans
-base_link_frame: laser
 size: 60
 factor: 1.0
 # overlap: 35
