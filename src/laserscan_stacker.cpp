@@ -37,7 +37,7 @@ pointcloud_msgs::PointCloud2_Segments bufferToAccumulator(const sensor_msgs::Las
         tmp_index = last_valid_index;
       }
       if (tmp_index >= 0) {
-        z_diff = std::max(0.0, v[tmp_index].points[0].z + ros::Duration(v[j].header.stamp - v[tmp_index].header.stamp).toSec() * factor);
+        z_diff = std::max(0.0, v[tmp_index].points[0].z + factor); //ros::Duration(v[j].header.stamp - v[tmp_index].header.stamp).toSec() * factor);
         for (size_t i=0; i < v[j].points.size(); i++) {
             v[j].points[i].z = z_diff;
         }
@@ -101,7 +101,8 @@ void scanCallback (const sensor_msgs::LaserScan::ConstPtr scan_in){
 
     if (v.size() == size){
       pub.publish(bufferToAccumulator(scan_in));
-      v.erase(v.begin(), v.begin() + overlap);
+      // v.erase(v.begin(), v.begin() + overlap);
+      v.erase(v.begin(), v.end());
     }
   }
   catch(...){}
