@@ -101,8 +101,8 @@ void scanCallback (const sensor_msgs::LaserScan::ConstPtr scan_in){
 
     if (v.size() == size){
       pub.publish(bufferToAccumulator(scan_in));
-      // v.erase(v.begin(), v.begin() + overlap);
-      v.erase(v.begin(), v.end());
+      v.erase(v.begin(), v.begin() + overlap);
+      //v.erase(v.begin(), v.end());
     }
   }
   catch(...){}

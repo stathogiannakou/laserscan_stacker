@@ -1,7 +1,7 @@
 input_topic: /scan_filtered
 #input_topic: /scan
 out_topic: laserscan_stacker/scans
-size: 2
+size: 30
 factor: 0.05
 # overlap: 35
 overlap: 1
